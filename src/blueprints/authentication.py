@@ -80,8 +80,8 @@ def login():
     }), HTTP_200_OK
 
 
+# @jwt_refresh_token_required()
 @auth.get("/token/refresh")
-@jwt_refresh_token_required()
 def refresh_token():
     identity = get_jwt_identity()
     access = create_access_token(identity=identity)
