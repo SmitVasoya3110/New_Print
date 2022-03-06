@@ -115,11 +115,12 @@ def cart_upload():
     def travers_file(final_result: list, files: list, size: str, typ: str, side: str, dtime: str , user_id: int=None):
         num_dict = {"numbers":[]}
         total_pages = 0
+        print("Thread Started")
         for file in files:
             print(">}>}"*20, file)
             print(file.mimetype)
             filename = typ+"_"+size+"_"+side+"_"+str(dtime)+"_"+secure_filename(file.filename)
-
+            print(filename)
             if file.mimetype == "application/pdf":
                 npath = os.path.join(application.config['UPLOAD_FOLDER'], filename)
                 file.save(npath)
@@ -170,7 +171,7 @@ def cart_upload():
 
     metadata = json.loads(request.form.get('metadata'))
     meta_data = metadata['metadata']
-    user_id = meta_data['user_id']
+    # user_id = meta_data['user_id']
     current_tp = str(time.time())
     traverse_files = time.perf_counter()
 
@@ -194,7 +195,7 @@ def cart_upload():
         th = threading.Thread(target=travers_file, args=(final_result, files, size, typ, side, current_tp))
         th.start()
         thread_list.append(th)
-    
+    print("Thread started")
     for thread in thread_list:
         thread.join()
     end_traversal = time.perf_counter()
