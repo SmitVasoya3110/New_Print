@@ -201,6 +201,6 @@ def cart_upload():
     end_traversal = time.perf_counter()
     print(final_result)
     print("Estimated Time Taken By File Traversal and Page Calculation is: ", end_traversal-traverse_files)
-    return {"traversl_time": (end_traversal-traverse_files)}
+    return {"traversl_time": (end_traversal-traverse_files), "final_result":final_result}
 
 
