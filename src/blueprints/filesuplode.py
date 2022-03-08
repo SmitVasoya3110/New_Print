@@ -246,12 +246,14 @@ def send_mail():
             req_data = request.get_json()
             order_id: int = req_data.get('order_id')
             files: list = req_data.get('files', [])
-            psize: str =  req_data.get('psize', '')
+            psize: str =  req_data.get('size', '')
             side: str =  req_data.get('side', '')
             amount: float = req_data.get('amount', 0.0)
             receiver: str = req_data.get('receiver', '')
 
             threading.Thread(target=send_attachment, args=(order_id, files, psize, side, amount, receiver)).start()
+
+            return {"message":"sending email"}
         except Exception as e:
             print(e)
             return {"message": "Internal Server Error"}
