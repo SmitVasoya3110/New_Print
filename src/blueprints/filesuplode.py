@@ -141,6 +141,7 @@ def cart_upload():
                     num_dict['Total_Images'] += 1
                 else:
                     num_dict['Total_Images'] = 1
+                num_dict['numbers'].append({"filename": filename, 'pages': 1})
                 total_pages += 1
 
             if file.mimetype in MIME:
