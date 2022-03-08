@@ -7,8 +7,9 @@ from werkzeug.utils import secure_filename
 import PyPDF2 as pypdf
 import magic
 import time
-from flask_mail import Mail, Message
-from flask import g
+from flask_mail import Message
+# from flask import g
+from src.extensions import mail
 import threading
 from flask import current_app as application
 from src.constants.constfunctions import A3_BC, A3_C, A4_BC, A4_C, allowed_file
@@ -208,7 +209,6 @@ def cart_upload():
 
 
 
-mail = Mail(application)
 
 @handle_files.post('send-mail')
 def send_mail():

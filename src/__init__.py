@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
-from flask_mail import Mail
+from src.extensions import mail
 from src.database import db
 from src.blueprints.authentication import auth
 from src.blueprints.filesuplode import handle_files
@@ -43,7 +43,7 @@ def create_app(test_config=None):
     db.app = app
     db.init_app(app)
     migrate = Migrate(app, db)
-    mail = Mail(app)
+    mail.init_app(app)
     app.register_blueprint(auth)
     app.register_blueprint(handle_files)
 
