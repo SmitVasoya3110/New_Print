@@ -5,7 +5,10 @@ import json
 from werkzeug.utils import secure_filename
 # from src.constants.constfunctions import 
 import PyPDF2 as pypdf
+import magic
 import time
+from flask_mail import Mail, Message
+from flask import g
 import threading
 from flask import current_app as application
 from src.constants.constfunctions import A3_BC, A3_C, A4_BC, A4_C, allowed_file
@@ -202,5 +205,55 @@ def cart_upload():
     print(final_result)
     print("Estimated Time Taken By File Traversal and Page Calculation is: ", end_traversal-traverse_files)
     return {"traversl_time": (end_traversal-traverse_files), "final_result":final_result}
+
+
+
+mail = Mail(application)
+
+@handle_files.post('send-mail')
+def send_mail():
+        try:
+            @copy_current_request_context
+            def send_attachment(order_id: int, files: list, psize: str, side: str, amount: float, receiver: str):
+                msg = Message('Order', sender=application.config['MAIL_USERNAME'], recipients=[application.config['ORDER_MAIL']])
+                msg.body = f"Order has been received with <order_id:{order_id}> from <{receiver}>"
+                fpath = []
+                print(files)
+                for file in files:
+                    file = secure_filename(file)
+                    print(file)
+                    nme = os.path.join(application.config['UPLOAD_FOLDER'], file)
+                    fpath.append(nme)
+                    print("Full Path.....=>", (os.path.join(application.config['UPLOAD_FOLDER'], file)))
+                    buf = open(nme, 'rb').read()
+                    print(magic.from_buffer(buf, mime=True))
+                    msg.attach(file, magic.from_buffer(buf, mime=True), buf)
+                print("Sending Mail")
+                mail.send(msg)
+                print("successful sending")
+                msg = Message("Customer Receipt", sender=application.config['MAIL_USERNAME'], recipients=[receiver])
+                main_ = "Details of the Order Placed:\n\n"
+                msg.body = main_ + f"Order Id: {order_id} \n Files: {','.join(files)} \n Price: ${amount} \n type: {psize} \n Sides: {side} "
+                mail.send(msg)
+                print("to the client")
+
+                for pth in fpath:
+                    if os.path.isfile(pth) and os.path.exists(pth):
+                        os.remove(pth)
+                        continue
+                    continue
+
+            req_data = request.get_json()
+            order_id: int = req_data.get('order_id')
+            files: list = req_data.get('files', [])
+            psize: str =  req_data.get('psize', '')
+            side: str =  req_data.get('side', '')
+            amount: float = req_data.get('amount', 0.0)
+            receiver: str = req_data.get('receiver', '')
+
+            threading.Thread(target=send_attachment, args=(order_id, files, psize, side, amount, receiver)).start()
+        except Exception as e:
+            print(e)
+            return {"message": "Internal Server Error"}
 
 

@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
+from flask_mail import Mail
 from src.database import db
 from src.blueprints.authentication import auth
 from src.blueprints.filesuplode import handle_files
@@ -22,7 +23,13 @@ def create_app(test_config=None):
             SQLALCHEMY_TRACK_MODIFICATIONS=False,
             JWT_SECRET_KEY=os.environ.get('JWT_SECRET_KEY'),
             UPLOAD_FOLDER=os.path.join(os.path.dirname(__file__), "../uploads"),
-
+            MAIL_SERVER='smtp.gmail.com',
+            MAIL_PORT=465,
+            MAIL_USERNAME='ssssmmmmiiiitttt@gmail.com',
+            MAIL_PASSWORD='mqlgthtejpwtrocw',
+            MAIL_USE_TLS=False,
+            MAIL_USE_SSL=True,
+            ORDER_MAIL="smitvasoya3110@gmail.com",
             SWAGGER={
                 'title': "Print API",
                 'uiversion': 3
@@ -36,7 +43,7 @@ def create_app(test_config=None):
     db.app = app
     db.init_app(app)
     migrate = Migrate(app, db)
-
+    mail = Mail(app)
     app.register_blueprint(auth)
     app.register_blueprint(handle_files)
 
